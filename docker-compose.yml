@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wordduel}
+      POSTGRES_USER: ${POSTGRES_USER:-wordduel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wordduel_dev_password}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - wordduel_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wordduel} -d ${POSTGRES_DB:-wordduel}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/WordDuel.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-wordduel};Username=${POSTGRES_USER:-wordduel};Password=${POSTGRES_PASSWORD:-wordduel_dev_password}"
+      ConnectionStrings__Redis: "redis:6379"
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:-local-dev-signing-key-please-change-me-32bytes+}
+      Jwt__Issuer: ${JWT_ISSUER:-worddue-api}
+      Jwt__Audience: ${JWT_AUDIENCE:-worddue-client}
+      Cors__AllowedOrigins__0: "http://localhost:${WEB_HOST_PORT:-3000}"
+    ports:
+      - "${API_HOST_PORT:-5080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: src/word-duel-web
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_HOST_PORT:-3000}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  wordduel_postgres_data:

@@ -1,0 +1,25 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Node / client
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Test artifacts
+TestResults/
+tests/word-duel-e2e/playwright-report/
+tests/word-duel-e2e/test-results/
+tests/word-duel-e2e/node_modules/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store

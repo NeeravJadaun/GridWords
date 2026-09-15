@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WordDuel.Api/WordDuel.Api.csproj" />
+    <Project Path="src/WordDuel.Domain/WordDuel.Domain.csproj" />
+    <Project Path="src/WordDuel.Infrastructure/WordDuel.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WordDuel.IntegrationTests/WordDuel.IntegrationTests.csproj" />
+    <Project Path="tests/WordDuel.UnitTests/WordDuel.UnitTests.csproj" />
+  </Folder>
+</Solution>
