@@ -34,7 +34,7 @@ jobs:
       - name: Unit tests
         run: dotnet test tests/WordDuel.UnitTests/WordDuel.UnitTests.csproj --no-build -c Release --logger "console;verbosity=normal"
 
-      - name: Integration tests (Testcontainers: Postgres + Redis)
+      - name: "Integration tests (Testcontainers: Postgres + Redis)"
         run: dotnet test tests/WordDuel.IntegrationTests/WordDuel.IntegrationTests.csproj -c Release --logger "console;verbosity=normal"
 
   frontend:
